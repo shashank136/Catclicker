@@ -23,14 +23,10 @@
                     clicks: 0
                 };
             
-                var index = -1;
-                
                 var getCount = function(catObj){
-                    //alert('Hello');
                     var temp = catObj.clicks;
                     catObj.clicks = ++temp;
                     $('#counterValue').val(temp);
-                    //alert($('#counterValue').val(temp));
                 };
                 
                 // Array object for catList
