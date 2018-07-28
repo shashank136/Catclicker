@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Cat Clicker</title>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script>
-            $(document).ready(function(){
-                
-                // Cat objects for the three types of cats
+<head>
+	<title>Premium Cat Clicker Game</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script>
+		$(document).ready(function(){
+			
+			/*======= Model ========*/
 
-                var catNameList = [
-                    {
+			var model = {
+				currentCat: null,
+				cats: [
+					{
                         name: "Rango",
                         add: "https://lh3.ggpht.com/nlI91wYNCrjjNy5f-S3CmVehIBM4cprx-JFWOztLk7vFlhYuFR6YnxcT446AvxYg4Ab7M1Fy0twaOCWYcUk=s0#w=640&h=426",
                         clicks: 0
@@ -29,62 +31,101 @@
                         add: "https://lh4.ggpht.com/dUJNejPqb_qLsV1kfWcvviqc7adxsw02BSAm8YLWNklP4lI6fQCLKXd-28uKuchtjoEUpqFN0K6kkTSDHw=s0#w=588&h=640",
                         clicks: 0
                     }
+				]
+			};
 
-                ];
-               
-            
-                var getCount = function(catObj){
-                    var temp = catObj.clicks;
-                    catObj.clicks = ++temp;
-                    $('#counterValue').val(temp);
-                };
-                
-                
-                for(var i=0; i<catNameList.length; i++){
-                    
-                    var val = catNameList[i].name;                    
-                    
-                    var diva = document.createElement('div');
-                    diva.textContent = val;
-                    
-                    diva.addEventListener('click', (function(x){                        
-                        return function(){                            
-                            // Clear the Cat Area each time a option is clicked in the list.
-                            console.log(x.clicks);
-                            $('#catArea').empty();
-                            
-                            // Display the cat name
-                            var catName = document.createElement('h2');
-                            catName.textContent = x.name;
-                            $('#catArea').append(catName);
-                            
-                            // Add the cat image to the list.
-                            var catImg = document.createElement('img');
-                            catImg.setAttribute('id','catImage');
-                            catImg.setAttribute('src', x.add);
-                            $('#catArea').append(catImg);
-                            
-                            // Add the counter for the no. of clicks in the catArea
-                            $('#catArea').append(document.createElement('br'));
-                            var counter = document.createElement('INPUT');
-                            counter.setAttribute('type','number');
-                            counter.setAttribute('id','counterValue');
-                            counter.setAttribute('value', x.clicks);
-                            $('#catArea').append(counter);
-                            
-                            catImg.addEventListener('click', (function(){
-                                return getCount(x);
-                            }));
-                        };
-                    })(catNameList[i]));
-                    
-                    $('#catList').append(diva);
-                };                                
-            });
-        </script>
-    </head>
-    <body>
-        <div id="catList"></div>
-        <div id="catArea"></div>
-    </body>
+			/*======= Controller =======*/
+
+			var controller = {
+				init: function(){
+					model.currentCat = model.cats[0];
+					catList.init();
+					catArea.init();
+				},
+
+				getCurrentCat: function(){
+					return model.currentCat;
+				},
+
+				getCats: function(){
+					return model.cats;
+				},
+
+				setCurrentCat: function(cat){
+					model.currentCat = cat;
+				},
+
+				incrementCounter: function(){
+					model.currentCat.clicks++;
+					catArea.render();
+				}
+			};
+
+			/*======= View =======*/
+
+			var catArea = {
+				init: function(){
+					this.ele = document.getElementById('catArea');
+					this.catNameEle = document.getElementById('catName');
+					this.catImgEle = document.getElementById('catImg');
+					this.catClickEle = document.getElementById('clickCount');
+
+					this.catImgEle.addEventListener('click', function(){
+						controller.incrementCounter();
+					});
+
+					this.render();
+				},
+
+				render: function(){
+					var currentCat = controller.getCurrentCat();
+					this.catNameEle.textContent = currentCat.name;
+					this.catImgEle.src = currentCat.add;
+					this.catClickEle.textContent = currentCat.clicks;
+				}
+			};
+
+			var catList = {
+				init: function(){
+					this.catListEle = document.getElementById('catList');
+					this.render();
+				},
+
+				render: function(){
+
+					var cats = controller.getCats();
+
+					this.catListEle.innerHTML = '';
+
+					for(var i=0; i<cats.length; i++){
+						var cat = cats[i];
+						var liEle = document.createElement('li');
+						liEle.textContent = cat.name;
+
+						liEle.addEventListener('click', (function(catCopy){
+							return function(){
+								controller.setCurrentCat(catCopy);
+								catArea.render();
+							};
+						})(cat));
+
+						this.catListEle.appendChild(liEle);
+					};
+				}
+			};
+
+			controller.init();			
+		});
+	</script>
+</head>
+<body>
+<div id="catListArea">
+	<ul id="catList"></ul>
+</div>
+<div id="catArea">
+	<h2 id="catName"></h2>
+	<img src="" id="catImg"/>
+	<h3 id="clickCount"></h3>
+</div>
+</body>
 </html>
